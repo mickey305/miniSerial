@@ -41,15 +41,22 @@ public class DataSerializer<T> {
   
   private T loaded;
   
-  /** ファイルからロードする */
+  /** ファイルからロードする。存在しないときはインスタンスを作成する */
   public T get() {   
+    mayGet();
+    if (loaded != null) return loaded;
+    return loaded = createNew();
+  }
+
+  /** ファイルからロードする。存在しないときはnullを返す */
+  public T mayGet() {
     if (loaded != null) return loaded;
     byte[]serialized = dataIO.getData(dataKey);
-    if (serialized == null) return createNew();
+    if (serialized == null) return null;
     try {
       return loaded = fromSerialized(serialized);
     } catch (Exception ex) {
-      return loaded = createNew();
+      return null;
     }
   }
   
